@@ -1,0 +1,58 @@
+"""
+Author      : VETRIVEL.K
+Language    : PYTHON
+Description : REAL TIME IMAGE BASED SMART VOTING SYSTEM
+Module      : IT IS USED TO IDENTIFY ALREADY VOTED PERSON AND STORE SCAN DATA IN EXCEL SHEET 
+
+"""
+import tkinter as tk
+from tkinter import messagebox
+import cv2
+from pyzbar.pyzbar import decode
+import openpyxl
+import time
+
+# Create the main application window
+root = tk.Tk()
+root.geometry("450x200")
+
+# Create an Excel workbook and sheet to store barcode data
+wb = openpyxl.Workbook()
+sheet = wb.active
+sheet.title = "Barcode Data"
+sheet['A1'] = "Barcode Data"
+
+
+# Function to start reading barcodes and store in Excel
+def bar():
+    cap = cv2.VideoCapture(0)
+    used_codes = []
+    workbook = openpyxl.Workbook()
+    workspace = workbook.active
+    while True:
+        success, frame = cap.read()
+        for code in decode(frame):
+            if code.data.decode('utf-8') not in used_codes:
+                messagebox.showinfo("Barcode Data", f"APPROVED TO VOTE")
+                print(code.data.decode('utf-8'))
+                used_codes.append(code.data.decode('utf-8'))
+                time.sleep(2)
+                workspace.append([code.data.decode('utf-8')])
+            elif code.data.decode('utf-8') in used_codes:
+                messagebox.showinfo("Barcode Data", f"ALREADY VOTED PLEASE CHECK")
+                time.sleep(2)
+            else:
+                pass
+        workbook.save("barcode data .xlsx")
+
+
+# create title for project
+scan_button = tk.Button(root, text="SMART VOTING SYSTEM", font="arial 25  bold")
+scan_button.pack(pady=10)
+
+# Create a button to start scanning and store in Excel
+scan_button = tk.Button(root, text="Start Scan", font="arial 25 bold", command=bar)
+scan_button.pack()
+root.mainloop()
+
+"""-------------------------------------- CODE END -----------------------------------"""
